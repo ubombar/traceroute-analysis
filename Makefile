@@ -22,13 +22,11 @@ venv: ## Create .venv and install dependencies
 init: venv ## Initialize meta.json and data directory
 	@./scripts/init.py
 
-
-stream_retina: init ## Stream live retina data (usage: make stream_retina DURATION=60s BATCH_SIZE=1000 RETINA_STREAM_ENDPINT="")
+stream_retina: init venv ## Stream live retina data (usage: make stream_retina DURATION=60s BATCH_SIZE=1000 RETINA_STREAM_ENDPINT="")
 	@./scripts/stream_retina.py $(DURATION) \
 		--url $(RETINA_STREAM_ENDPINT) \
 		--batch-size $(BATCH_SIZE) \
 		--db data/$(shell date +'%Y%m%d%H%M%S')__stream_retina__$(DURATION).db
 
-
-query: init ## Run a SQLite query and output CSV (usage: make query DB=data/foo.db Q="SELECT * FROM fies")
+query: init venv ## Run a SQLite query and output CSV (usage: make query DB=data/foo.db Q="SELECT * FROM fies")
 	@./scripts/query.py $(DB) "$(Q)"
