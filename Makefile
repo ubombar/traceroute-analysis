@@ -25,4 +25,4 @@ stream_retina: init ## Stream live retina data (usage: make stream_retina DURATI
 	@./scripts/stream_retina.py $(DURATION) \
 		--url $(RETINA_STREAM_ENDPINT) \
 		--batch-size $(BATCH_SIZE) \
-		--db data/$(shell date +'%Y%m%d%H%M%S')__$(DURATION)__retina__stream.db
+		--db data/$(shell date +'%Y%m%d%H%M%S')__stream_retina__$(DURATION).db
