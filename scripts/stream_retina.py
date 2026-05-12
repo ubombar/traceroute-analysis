@@ -13,6 +13,7 @@ import signal
 import sqlite3
 import threading
 import httpx
+from datetime import datetime, timezone
 
 
 CREATE_SQL = """
@@ -33,13 +34,13 @@ CREATE TABLE IF NOT EXISTS fies (
     destination_address     TEXT        NOT NULL,
     near_probe_ttl          INTEGER,
     near_reply_address      TEXT,
-    near_sent_timestamp     TEXT,
-    near_received_timestamp TEXT,
+    near_sent_timestamp     INTEGER,
+    near_received_timestamp INTEGER,
     far_probe_ttl           INTEGER,
     far_reply_address       TEXT,
-    far_sent_timestamp      TEXT,
-    far_received_timestamp  TEXT,
-    production_timestamp    TEXT        NOT NULL
+    far_sent_timestamp      INTEGER,
+    far_received_timestamp  INTEGER,
+    production_timestamp    INTEGER     NOT NULL
 );
 """
 
@@ -61,6 +62,12 @@ def parse_duration(s: str) -> int:
     return int(s)
 
 
+def parse_timestamp(s: str) -> int:
+    if not s:
+        return 0
+    return int(datetime.fromisoformat(s).replace(tzinfo=timezone.utc).timestamp())
+
+
 def parse_record(obj: dict) -> tuple:
     near = obj.get("near_info") or {}
     far = obj.get("far_info") or {}
@@ -74,13 +81,13 @@ def parse_record(obj: dict) -> tuple:
         obj.get("destination_address") or "",
         near.get("probe_ttl") or 0,
         near.get("reply_address") or "",
-        near.get("sent_timestamp") or "",
-        near.get("received_timestamp") or "",
+        parse_timestamp(near.get("sent_timestamp") or ""),
+        parse_timestamp(near.get("received_timestamp") or ""),
         far.get("probe_ttl") or 0,
         far.get("reply_address") or "",
-        far.get("sent_timestamp") or "",
-        far.get("received_timestamp") or "",
-        obj.get("production_timestamp") or "",
+        parse_timestamp(far.get("sent_timestamp") or ""),
+        parse_timestamp(far.get("received_timestamp") or ""),
+        parse_timestamp(obj.get("production_timestamp") or ""),
     )
 
 
@@ -91,6 +98,7 @@ def stream(duration: int, batch_size: int, db_file: Path, url: str) -> None:
     con.executescript(CREATE_SQL)
 
     batch: list[tuple] = []
+    stop = threading.Event()
 
     def flush():
         if batch:
@@ -99,20 +107,20 @@ def stream(duration: int, batch_size: int, db_file: Path, url: str) -> None:
             batch.clear()
 
     def _signal(sig, frame):
-        flush()
-        con.close()
-        sys.exit(0)
+        stop.set()
 
     signal.signal(signal.SIGTERM, _signal)
     signal.signal(signal.SIGINT, _signal)
 
-    timer = threading.Timer(duration, lambda: os.kill(os.getpid(), signal.SIGTERM))
+    timer = threading.Timer(duration, stop.set)
     timer.start()
 
     try:
         with httpx.stream("GET", url, timeout=None) as resp:
             buf = ""
             for chunk in resp.iter_bytes():
+                if stop.is_set():
+                    break
                 buf += chunk.decode("utf-8", errors="replace")
                 while "\n" in buf:
                     line, buf = buf.split("\n", 1)

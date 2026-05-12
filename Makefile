@@ -13,7 +13,7 @@ venv: ## Create .venv and install dependencies
 	@if [ ! -d ".venv" ]; then \
 		echo "Creating .venv..."; \
 		python3 -m venv .venv; \
-		.venv/bin/pip install dataclasses-json httpx; \
+		.venv/bin/pip install dataclasses-json httpx notebook pandas numpy; \
 		echo "Done."; \
 	fi
 
