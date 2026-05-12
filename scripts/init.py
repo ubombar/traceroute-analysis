@@ -3,18 +3,18 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-import tracerouteanalysis as ts
+import tracerouteanalysis as ta
 
-logger = ts.get_logger(__name__)
+logger = ta.get_logger(__name__)
 
 def main():
     # Initialize meta.json
-    if not ts.DEFAULT_META_FILE.exists():
-        logger.info("Creating %s...", ts.DEFAULT_META_FILE)
-        ts.Meta()  # __post_init__ creates the file automatically
-        logger.info("Created %s.", ts.DEFAULT_META_FILE)
+    if not ta.DEFAULT_META_FILE.exists():
+        logger.info("Creating %s...", ta.DEFAULT_META_FILE)
+        ta.Meta()  # __post_init__ creates the file automatically
+        logger.info("Created %s.", ta.DEFAULT_META_FILE)
     else:
-        logger.info("%s already exists.", ts.DEFAULT_META_FILE)
+        logger.info("%s already exists.", ta.DEFAULT_META_FILE)
 
     # Initialize ./data directory
     data_dir = Path("./data")

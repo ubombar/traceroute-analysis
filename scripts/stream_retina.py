@@ -1,15 +1,19 @@
 #!/usr/bin/env .venv/bin/python3
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+import tracerouteanalysis as ta
+logger = ta.get_logger(__name__)
+
 import argparse
 import json
 import os
 import signal
 import sqlite3
-import sys
 import threading
-from pathlib import Path
-
 import httpx
+
 
 CREATE_SQL = """
 PRAGMA journal_mode = OFF;
@@ -54,7 +58,7 @@ def parse_duration(s: str) -> int:
     units = {"s": 1, "m": 60, "h": 3600, "d": 24 * 3600, "w": 7 * 24 * 3600}
     if s[-1] in units:
         return int(s[:-1]) * units[s[-1]]
-    return int(s)  # fallback: plain integer
+    return int(s)
 
 
 def parse_record(obj: dict) -> tuple:
@@ -81,7 +85,7 @@ def parse_record(obj: dict) -> tuple:
 
 
 def stream(duration: int, batch_size: int, db_file: Path, url: str) -> None:
-    print(f"Streaming to {db_file} (batch size: {batch_size})...")
+    logger.info("Streaming to %s (batch size: %d)...", db_file, batch_size)
 
     con = sqlite3.connect(db_file)
     con.executescript(CREATE_SQL)
@@ -132,11 +136,11 @@ def stream(duration: int, batch_size: int, db_file: Path, url: str) -> None:
 
 
 def build_indexes(db_file: Path) -> None:
-    print("Building indexes...")
+    logger.info("Building indexes...")
     con = sqlite3.connect(db_file)
     con.executescript(INDEX_SQL)
     con.close()
-    print("Indexes created.")
+    logger.info("Indexes created.")
 
 
 if __name__ == "__main__":
@@ -149,5 +153,5 @@ if __name__ == "__main__":
 
     args.db.parent.mkdir(parents=True, exist_ok=True)
     stream(args.duration, args.batch_size, args.db, args.url)
-    print(f"Streaming ended: {args.db}")
+    logger.info("Streaming ended: %s", args.db)
     build_indexes(args.db)

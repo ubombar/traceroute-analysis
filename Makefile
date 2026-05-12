@@ -1,12 +1,10 @@
-.PHONY: help init venv fetch_retina
+.PHONY: help init venv stream_retina
 
 export PYTHONDONTWRITEBYTECODE=1
 
 RETINA_STREAM_ENDPINT ?= https://iprl.dioptra.io/api/v1/stream
 BATCH_SIZE ?= 1000 
-
-# Fetch duration
-FD ?= 60s 
+DURATION ?= 60s 
 
 help: ## Display this help menu
 	@awk 'BEGIN {FS = ":.*##"; printf "Traceoute Analysis Help Menu\n\n"} /^[a-zA-Z_-]+:.*##/ { printf "  %-16s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -23,8 +21,8 @@ init: venv ## Initialize meta.json and data directory
 	@./scripts/init.py
 
 
-fetch_retina: init ## Fetch retina data (usage: make fetch_retina FD=60s BATCH_SIZE=1000 RETINA_STREAM_ENDPINT="")
-	@./scripts/fetch_retina_data.py $(FD) \
+stream_retina: init ## Stream live retina data (usage: make stream_retina DURATION=60s BATCH_SIZE=1000 RETINA_STREAM_ENDPINT="")
+	@./scripts/stream_retina.py $(DURATION) \
 		--url $(RETINA_STREAM_ENDPINT) \
 		--batch-size $(BATCH_SIZE) \
-		--db data/$(shell date +'%Y%m%d__%H%M%S')__$(FD).db
+		--db data/$(shell date +'%Y%m%d%H%M%S')__$(DURATION)__retina__stream.db
