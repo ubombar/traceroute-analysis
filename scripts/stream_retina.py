@@ -34,13 +34,13 @@ CREATE TABLE IF NOT EXISTS fies (
     destination_address     TEXT        NOT NULL,
     near_probe_ttl          INTEGER,
     near_reply_address      TEXT,
-    near_sent_timestamp     INTEGER,
-    near_received_timestamp INTEGER,
+    near_sent_timestamp     TEXT,
+    near_received_timestamp TEXT,
     far_probe_ttl           INTEGER,
     far_reply_address       TEXT,
-    far_sent_timestamp      INTEGER,
-    far_received_timestamp  INTEGER,
-    production_timestamp    INTEGER     NOT NULL
+    far_sent_timestamp      TEXT,
+    far_received_timestamp  TEXT,
+    production_timestamp    TEXT     NOT NULL
 );
 """
 
@@ -62,12 +62,6 @@ def parse_duration(s: str) -> int:
     return int(s)
 
 
-def parse_timestamp(s: str) -> int:
-    if not s:
-        return 0
-    return int(datetime.fromisoformat(s).replace(tzinfo=timezone.utc).timestamp())
-
-
 def parse_record(obj: dict) -> tuple:
     near = obj.get("near_info") or {}
     far = obj.get("far_info") or {}
@@ -81,13 +75,13 @@ def parse_record(obj: dict) -> tuple:
         obj.get("destination_address") or "",
         near.get("probe_ttl") or 0,
         near.get("reply_address") or "",
-        parse_timestamp(near.get("sent_timestamp") or ""),
-        parse_timestamp(near.get("received_timestamp") or ""),
+        near.get("sent_timestamp") or "",
+        near.get("received_timestamp") or "",
         far.get("probe_ttl") or 0,
         far.get("reply_address") or "",
-        parse_timestamp(far.get("sent_timestamp") or ""),
-        parse_timestamp(far.get("received_timestamp") or ""),
-        parse_timestamp(obj.get("production_timestamp") or ""),
+        far.get("sent_timestamp") or "",
+        far.get("received_timestamp") or "",
+        obj.get("production_timestamp") or "",
     )
 
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json
+from dataclasses_json import dataclass_json, config
 from pathlib import Path
 from typing import Optional
 from enum import Enum
@@ -16,15 +16,36 @@ class Platform(Enum):
     RETINA = "retina"
 
 
+class TableType(Enum):
+    FIES = "fies"
+    RESULTS = "results"
+
+
 @dataclass_json
 @dataclass
 class ExperimentMeta:
     id: str
     data_file: str
-    platform: Platform
+    platform: Platform = field(
+        metadata=config(
+            encoder=lambda p: p.value,
+            decoder=Platform,
+        )
+    )
+    table_type: TableType = field(
+        metadata=config(
+            encoder=lambda t: t.value,
+            decoder=TableType,
+        )
+    )
     created_at: str
-    ended_at: Optional[str]
     date_range: tuple[str, str]
+    timespan: float                       # seconds
+    num_elements: int
+    distinct_ipv4_addresses: int
+    distinct_ipv6_addresses: int
+    distinct_probing_directives: int
+    agent_ids: list[str]
 
 
 @dataclass
@@ -42,8 +63,9 @@ class Meta:
             self.save()
 
     def save(self) -> None:
+        content = json.dumps({"experiments": {k: v.to_dict() for k, v in self.experiments.items()}}, indent=2)
         with open(self.file, "w") as f:
-            json.dump({"experiments": {k: v.to_dict() for k, v in self.experiments.items()}}, f, indent=2)
+            f.write(content)
 
     def add_experiment(self, experiment: ExperimentMeta) -> str:
         self.experiments[experiment.id] = experiment

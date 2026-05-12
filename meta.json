@@ -1,3 +1,60 @@
 {
-  "experiments": {}
+  "experiments": {
+    "707e86fe-b159-425c-80e3-7f2904c4a54f": {
+      "id": "707e86fe-b159-425c-80e3-7f2904c4a54f",
+      "data_file": "data/20260512153600__stream_retina__1h.db",
+      "platform": "retina",
+      "table_type": "fies",
+      "created_at": "2026-05-12T21:23:26.991677+00:00",
+      "date_range": [
+        "2026-05-12T13:36:00.751770+00:00",
+        "2026-05-12T14:36:00.499945+00:00"
+      ],
+      "timespan": 3599.748175,
+      "num_elements": 546773,
+      "distinct_ipv4_addresses": 120113,
+      "distinct_ipv6_addresses": 34,
+      "distinct_probing_directives": 110256,
+      "agent_ids": [
+        "retina-asia-south1",
+        "retina-europe-north1",
+        "retina-southamerica-east1",
+        "retina-asia-northeast1",
+        "retina-asia-southeast1",
+        "retina-us-east1",
+        "retina-us-west4",
+        "retina-asia-east1",
+        "retina-europe-west6",
+        "retina-me-central1"
+      ]
+    },
+    "52e200d2-b4e5-4853-b6e0-4c5ad67135c5": {
+      "id": "52e200d2-b4e5-4853-b6e0-4c5ad67135c5",
+      "data_file": "data/20260512232210__stream_retina__5s.db",
+      "platform": "retina",
+      "table_type": "fies",
+      "created_at": "2026-05-12T21:23:26.993630+00:00",
+      "date_range": [
+        "2026-05-12T21:22:12.228631+00:00",
+        "2026-05-12T21:22:16.877953+00:00"
+      ],
+      "timespan": 4.649322,
+      "num_elements": 725,
+      "distinct_ipv4_addresses": 922,
+      "distinct_ipv6_addresses": 0,
+      "distinct_probing_directives": 725,
+      "agent_ids": [
+        "retina-southamerica-east1",
+        "retina-us-west4",
+        "retina-asia-east1",
+        "retina-asia-northeast1",
+        "retina-asia-southeast1",
+        "retina-us-east1",
+        "retina-asia-south1",
+        "retina-me-central1",
+        "retina-europe-north1",
+        "retina-europe-west6"
+      ]
+    }
+  }
 }
