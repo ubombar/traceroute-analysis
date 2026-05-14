@@ -109,6 +109,7 @@ def stream(duration: int, batch_size: int, db_file: Path, url: str) -> None:
     timer = threading.Timer(duration, stop.set)
     timer.start()
 
+
     try:
         with httpx.stream("GET", url, timeout=None) as resp:
             buf = ""
@@ -149,9 +150,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch retina data from a stream.")
     parser.add_argument("duration", type=parse_duration, help="Stream duration (e.g. 10s, 5m, 1h, 2d, 1w)")
     parser.add_argument("--url", required=True, help="Stream endpoint URL")
+    parser.add_argument("--filter", default="", required=False, help="Filtering query parameter f (any, one, both, <empty-for default>)")
     parser.add_argument("--db", required=True, type=Path, help="Output SQLite database file path")
     parser.add_argument("--batch-size", required=True, type=int, help="Number of rows per insert batch")
     args = parser.parse_args()
+
+    if args.filter != "":
+        args.url = f"{args.url}?f={args.filter}"
 
     args.db.parent.mkdir(parents=True, exist_ok=True)
     stream(args.duration, args.batch_size, args.db, args.url)

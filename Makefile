@@ -7,6 +7,7 @@ BATCH_SIZE ?= 1000
 DURATION ?= 60s
 DB ?=
 Q ?=
+F ?= ""
 PLATFORM ?=
 FROM_DATE ?=
 TO_DATE ?=
@@ -29,6 +30,7 @@ stream_retina: init venv ## Stream live retina data (usage: make stream_retina D
 	@./scripts/stream_retina.py $(DURATION) \
 		--url $(RETINA_STREAM_ENDPINT) \
 		--batch-size $(BATCH_SIZE) \
+		--filter $(F) \
 		--db data/$(shell date +'%Y%m%d%H%M%S')__stream_retina__$(DURATION).db
 
 query: init ## Run a SQLite query and output CSV (usage: make query DB=data/foo.db Q="SELECT * FROM fies")
